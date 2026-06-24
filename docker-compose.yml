@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - NEXT_PUBLIC_GRAPHQL_URL=http://graphql:4000/graphql
+    depends_on:
+      - graphql
+    networks:
+      - staybook-network
+
+  graphql:
+    build:
+      context: .
+      dockerfile: docker/graphql/Dockerfile
+    ports:
+      - '4000:4000'
+    environment:
+      - DATABASE_URL=postgresql://staybook:staybook_pass@db:5432/staybook_db
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=4000
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - staybook-network
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=staybook
+      - POSTGRES_PASSWORD=staybook_pass
+      - POSTGRES_DB=staybook_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U staybook -d staybook_db']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - staybook-network
+
+volumes:
+  postgres_data:
+
+networks:
+  staybook-network:
+    driver: bridge

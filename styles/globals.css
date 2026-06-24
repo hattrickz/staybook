@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --brand: #1D9E75;
+    --brand-light: #E1F5EE;
+    --brand-dark: #0F6E56;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #111827;
+    background: #FFFFFF;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  input[type='date']::-webkit-calendar-picker-indicator {
+    opacity: 0.5;
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand text-white font-medium px-4 py-2.5 rounded-lg hover:bg-brand-600 transition-colors duration-150 text-sm;
+  }
+
+  .btn-outline {
+    @apply border border-border text-ink-primary font-medium px-4 py-2.5 rounded-lg hover:bg-surface-secondary transition-colors duration-150 text-sm;
+  }
+
+  .btn-ghost {
+    @apply text-ink-secondary font-medium px-3 py-2 rounded-lg hover:bg-surface-secondary transition-colors duration-150 text-sm;
+  }
+
+  .card {
+    @apply bg-white border border-border rounded-xl shadow-card;
+  }
+
+  .input {
+    @apply w-full border border-border rounded-lg px-3 py-2.5 text-sm text-ink-primary placeholder:text-ink-tertiary focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all duration-150;
+  }
+
+  .label {
+    @apply block text-xs font-medium text-ink-secondary mb-1.5 uppercase tracking-wide;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md;
+  }
+
+  .section-title {
+    @apply text-xl font-semibold text-ink-primary;
+  }
+
+  .star-filled {
+    @apply text-amber-400;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
