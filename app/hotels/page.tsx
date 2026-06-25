@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@apollo/client'
 import { SlidersHorizontal, Grid3X3, List, X } from 'lucide-react'
@@ -51,7 +51,7 @@ function HotelCardSkeleton({ variant }: { variant: 'grid' | 'list' }) {
   )
 }
 
-export default function HotelsPage() {
+function HotelsContent() {
   const searchParams = useSearchParams()
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -315,5 +315,13 @@ export default function HotelsPage() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function HotelsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HotelsContent />
+    </Suspense>
   )
 }

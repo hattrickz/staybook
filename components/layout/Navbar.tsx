@@ -1,5 +1,5 @@
 'use client'
-
+import type { Route } from 'next'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { User, Menu, X, LogOut, LayoutDashboard } from 'lucide-react'
@@ -46,7 +46,7 @@ export function Navbar() {
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
+                href={link.href as Route}
                 className={cn(
                   'text-sm transition-colors',
                   pathname === link.href
@@ -127,7 +127,7 @@ export function Navbar() {
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
-              href={link.href}
+              href={link.href as Route}
               className="block py-2.5 px-3 rounded-lg text-sm text-ink-secondary hover:bg-surface-secondary hover:text-ink-primary"
               onClick={() => setMenuOpen(false)}
             >

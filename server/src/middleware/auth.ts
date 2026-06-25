@@ -4,10 +4,14 @@ export interface Context {
     user: TokenPayload | null
 }
 
-export function getContext({ req }: { req: any }): Context {
+export async function getContext(
+    { req }: { req: any }
+): Promise<Context> {
     const auth = req.headers.authorization || ''
 
-    if (!auth.startsWith('Bearer ')) return { user: null }
+    if (!auth.startsWith('Bearer ')) {
+        return { user: null }
+    }
 
     try {
         const token = auth.replace('Bearer ', '')

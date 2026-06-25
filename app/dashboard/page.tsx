@@ -1,5 +1,5 @@
 'use client'
-
+import type { Route } from 'next'
 import { useAuthStore } from '@/lib/store/auth'
 import { Navbar } from '@/components/layout/Navbar'
 import { CalendarDays, Clock, CheckCircle, XCircle, Building2, LayoutDashboard, Heart, Settings } from 'lucide-react'
@@ -63,7 +63,7 @@ export default function DashboardPage() {
               {NAV.map((item) => (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={item.href as Route}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-ink-secondary hover:bg-surface-secondary hover:text-ink-primary transition-colors"
                 >
                   <item.icon size={16} />
