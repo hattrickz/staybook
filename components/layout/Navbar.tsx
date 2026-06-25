@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { User, Menu, X, LogOut, LayoutDashboard } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -15,17 +15,28 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { user, isAuthenticated, logout } = useAuthStore()
   const [menuOpen, setMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
+  const handleLogout = () => {
+    logout()
+    setUserMenuOpen(false)
+    setMenuOpen(false)
+    router.push('/')
+  }
+
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14 md:h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-semibold text-lg text-ink-primary">
+          <Link
+            href="/"
+            className="flex items-center gap-2 font-semibold text-base md:text-lg text-ink-primary shrink-0"
+          >
             <span className="w-2 h-2 rounded-full bg-brand inline-block" />
             StayBook
           </Link>
@@ -64,7 +75,7 @@ export function Navbar() {
                 {userMenuOpen && (
                   <div className="absolute right-0 mt-1 w-48 bg-white border border-border rounded-xl shadow-elevated py-1 z-50">
                     <Link
-                      href="/dashboard"
+                      href={user.role === 'manager' ? '/dashboard/manager' : '/dashboard'}
                       className="flex items-center gap-2 px-4 py-2 text-sm text-ink-secondary hover:bg-surface-secondary"
                       onClick={() => setUserMenuOpen(false)}
                     >
@@ -72,7 +83,7 @@ export function Navbar() {
                       Dashboard
                     </Link>
                     <button
-                      onClick={() => { logout(); setUserMenuOpen(false) }}
+                      onClick={handleLogout}
                       className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
                       <LogOut size={15} />
@@ -89,41 +100,80 @@ export function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu toggle */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-surface-secondary"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          {/* Mobile right side */}
+          <div className="flex md:hidden items-center gap-2">
+            {isAuthenticated && user && (
+              <Link
+                href={user.role === 'manager' ? '/dashboard/manager' : '/dashboard'}
+                className="w-8 h-8 rounded-full bg-brand-50 flex items-center justify-center"
+              >
+                <User size={15} className="text-brand" />
+              </Link>
+            )}
+            <button
+              className="p-2 rounded-lg hover:bg-surface-secondary"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden border-t border-border bg-white px-4 py-4 space-y-2">
+        <div className="md:hidden border-t border-border bg-white px-4 py-4 space-y-1">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="block py-2 text-sm text-ink-secondary hover:text-ink-primary"
+              className="block py-2.5 px-3 rounded-lg text-sm text-ink-secondary hover:bg-surface-secondary hover:text-ink-primary"
               onClick={() => setMenuOpen(false)}
             >
               {link.label}
             </Link>
           ))}
-          <div className="pt-2 border-t border-border flex flex-col gap-2">
-            {isAuthenticated ? (
+          <div className="pt-2 border-t border-border mt-2 space-y-2">
+            {isAuthenticated && user ? (
               <>
-                <Link href="/dashboard" className="btn-outline text-center" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-                <button className="btn-ghost text-red-600 text-left" onClick={logout}>Sign out</button>
+                <div className="px-3 py-2">
+                  <p className="font-medium text-ink-primary text-sm">{user.name}</p>
+                  <p className="text-xs text-ink-tertiary">{user.email}</p>
+                </div>
+                <Link
+                  href={user.role === 'manager' ? '/dashboard/manager' : '/dashboard'}
+                  className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-ink-secondary hover:bg-surface-secondary"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <LayoutDashboard size={15} />
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 w-full px-3 py-2.5 rounded-lg text-sm text-red-600 hover:bg-red-50"
+                >
+                  <LogOut size={15} />
+                  Sign out
+                </button>
               </>
             ) : (
-              <>
-                <Link href="/auth/login" className="btn-outline text-center" onClick={() => setMenuOpen(false)}>Log in</Link>
-                <Link href="/auth/register" className="btn-primary text-center" onClick={() => setMenuOpen(false)}>Sign up</Link>
-              </>
+              <div className="flex flex-col gap-2 pt-1">
+                <Link
+                  href="/auth/login"
+                  className="btn-outline text-center py-2.5"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="btn-primary text-center py-2.5"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Sign up
+                </Link>
+              </div>
             )}
           </div>
         </div>

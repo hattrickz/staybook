@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(customer)
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings  Booking[]
+  hotels    Hotel[]
+}
+
+enum Role {
+  customer
+  manager
+  admin
+}
+
+model Hotel {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  location    String
+  city        String
+  country     String
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  images      String[]
+  amenities   Json
+  priceFrom   Float
+  currency    String   @default("NGN")
+  featured    Boolean  @default(false)
+  checkInTime  String  @default("2:00 PM")
+  checkOutTime String  @default("12:00 PM")
+  policies    String[]
+  managerId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  manager     User     @relation(fields: [managerId], references: [id])
+  rooms       Room[]
+  reviews     Review[]
+}
+
+model Room {
+  id                String   @id @default(cuid())
+  hotelId           String
+  name              String
+  roomType          RoomType
+  bedType           BedType
+  price             Float
+  currency          String   @default("NGN")
+  capacity          Int
+  size              Float
+  available         Boolean  @default(true)
+  images            String[]
+  amenities         String[]
+  description       String
+  refundable        Boolean  @default(true)
+  breakfastIncluded Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  hotel     Hotel     @relation(fields: [hotelId], references: [id])
+  bookings  Booking[]
+}
+
+enum RoomType {
+  standard
+  deluxe
+  suite
+  presidential
+  family
+}
+
+enum BedType {
+  single
+  double
+  queen
+  king
+  twin
+}
+
+model Booking {
+  id               String        @id @default(cuid())
+  userId           String
+  roomId           String
+  checkIn          DateTime
+  checkOut         DateTime
+  guests           Int
+  nights           Int
+  totalPrice       Float
+  currency         String        @default("NGN")
+  status           BookingStatus @default(pending)
+  specialRequests  String?
+  confirmationCode String        @unique
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id])
+  room   Room   @relation(fields: [roomId], references: [id])
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  checked_in
+  checked_out
+  cancelled
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  userId      String
+  hotelId     String
+  rating      Float
+  title       String
+  body        String
+  cleanliness Float    @default(0)
+  service     Float    @default(0)
+  location    Float    @default(0)
+  value       Float    @default(0)
+  createdAt   DateTime @default(now())
+
+  hotel Hotel @relation(fields: [hotelId], references: [id])
+}

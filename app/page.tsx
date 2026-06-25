@@ -1,10 +1,13 @@
+'use client'
+
+import { useQuery } from '@apollo/client'
+import { GET_FEATURED_HOTELS } from '@/graphql/queries'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { SearchBar } from '@/components/search/SearchBar'
 import { HotelCard } from '@/components/hotel/HotelCard'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import type { Hotel } from '@/types'
 
 const DESTINATIONS = [
   { name: 'Abuja', count: '48 hotels', emoji: '🏛️', color: 'from-emerald-500 to-teal-600' },
@@ -16,50 +19,6 @@ const DESTINATIONS = [
   { name: 'Tokyo', count: '189 hotels', emoji: '⛩️', color: 'from-red-500 to-red-700' },
 ]
 
-// Placeholder data — will come from GraphQL
-const FEATURED_HOTELS: Hotel[] = [
-  {
-    id: '1', name: 'Transcorp Hilton Abuja', description: '', location: 'Abuja, Nigeria',
-    city: 'Abuja', country: 'Nigeria', rating: 4.8, reviewCount: 1240,
-    images: [], amenities: [
-      { key: 'pool', label: 'Pool', icon: 'Waves' },
-      { key: 'wifi', label: 'Free WiFi', icon: 'Wifi' },
-      { key: 'restaurant', label: 'Restaurant', icon: 'UtensilsCrossed' },
-    ],
-    managerId: '1', priceFrom: 150000, currency: 'NGN', featured: true,
-  },
-  {
-    id: '2', name: 'Eko Hotel & Suites', description: '', location: 'Lagos, Nigeria',
-    city: 'Lagos', country: 'Nigeria', rating: 4.6, reviewCount: 892,
-    images: [], amenities: [
-      { key: 'spa', label: 'Spa', icon: 'Sparkles' },
-      { key: 'pool', label: 'Pool', icon: 'Waves' },
-      { key: 'bar', label: 'Bar', icon: 'Wine' },
-    ],
-    managerId: '2', priceFrom: 95000, currency: 'NGN',
-  },
-  {
-    id: '3', name: 'Azure Haven Resort', description: '', location: 'Dubai, UAE',
-    city: 'Dubai', country: 'UAE', rating: 4.9, reviewCount: 2100,
-    images: [], amenities: [
-      { key: 'beach_access', label: 'Beach', icon: 'Umbrella' },
-      { key: 'pool', label: 'Pool', icon: 'Waves' },
-      { key: 'concierge', label: 'Concierge', icon: 'Bell' },
-    ],
-    managerId: '3', priceFrom: 480, currency: 'USD', featured: true,
-  },
-  {
-    id: '4', name: 'The Langham London', description: '', location: 'London, UK',
-    city: 'London', country: 'UK', rating: 4.7, reviewCount: 3200,
-    images: [], amenities: [
-      { key: 'spa', label: 'Spa', icon: 'Sparkles' },
-      { key: 'restaurant', label: 'Restaurant', icon: 'UtensilsCrossed' },
-      { key: 'gym', label: 'Gym', icon: 'Dumbbell' },
-    ],
-    managerId: '4', priceFrom: 320, currency: 'GBP',
-  },
-]
-
 const STATS = [
   { value: '12,500+', label: 'Hotels worldwide' },
   { value: '180+', label: 'Countries covered' },
@@ -67,7 +26,33 @@ const STATS = [
   { value: '2M+', label: 'Happy travelers' },
 ]
 
+// Skeleton card for loading state
+function HotelCardSkeleton() {
+  return (
+    <div className="card overflow-hidden animate-pulse">
+      <div className="w-full h-52 bg-surface-tertiary" />
+      <div className="p-4 space-y-3">
+        <div className="h-4 bg-surface-tertiary rounded w-3/4" />
+        <div className="h-3 bg-surface-tertiary rounded w-1/2" />
+        <div className="h-3 bg-surface-tertiary rounded w-1/3" />
+        <div className="flex gap-2 mt-2">
+          <div className="h-5 w-12 bg-surface-tertiary rounded" />
+          <div className="h-5 w-12 bg-surface-tertiary rounded" />
+          <div className="h-5 w-12 bg-surface-tertiary rounded" />
+        </div>
+        <div className="flex justify-between pt-3 border-t border-border">
+          <div className="h-5 w-24 bg-surface-tertiary rounded" />
+          <div className="h-5 w-20 bg-surface-tertiary rounded" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function HomePage() {
+  const { data, loading, error } = useQuery(GET_FEATURED_HOTELS)
+  const hotels = data?.featuredHotels ?? []
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -87,7 +72,7 @@ export default function HomePage() {
         <SearchBar variant="hero" className="max-w-4xl mx-auto" />
       </section>
 
-      {/* Stats bar */}
+      {/* Stats */}
       <section className="border-y border-border bg-surface-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -126,7 +111,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Hotels */}
+      {/* Featured Hotels — live from GraphQL */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
         <div className="flex items-center justify-between mb-6">
           <h2 className="section-title">Featured hotels</h2>
@@ -134,17 +119,33 @@ export default function HomePage() {
             Browse all <ArrowRight size={14} />
           </Link>
         </div>
+
+        {error && (
+          <div className="text-center py-10 text-ink-tertiary text-sm">
+            Could not load hotels. Make sure the GraphQL server is running at localhost:4000.
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {FEATURED_HOTELS.map((hotel) => (
-            <HotelCard key={hotel.id} hotel={hotel} />
-          ))}
+          {loading
+            ? Array.from({ length: 4 }).map((_, i) => <HotelCardSkeleton key={i} />)
+            : hotels.map((hotel: any) => <HotelCard key={hotel.id} hotel={hotel} />)
+          }
         </div>
+
+        {!loading && !error && hotels.length === 0 && (
+          <div className="text-center py-10 text-ink-tertiary text-sm">
+            No featured hotels yet. Add some from the manager dashboard.
+          </div>
+        )}
       </section>
 
       {/* CTA */}
       <section className="bg-brand mx-4 sm:mx-6 lg:mx-8 mb-14 rounded-3xl">
         <div className="max-w-3xl mx-auto px-8 py-16 text-center">
-          <h2 className="text-3xl font-semibold text-white mb-4">List your property on StayBook</h2>
+          <h2 className="text-3xl font-semibold text-white mb-4">
+            List your property on StayBook
+          </h2>
           <p className="text-brand-100 mb-8 text-lg">
             Join thousands of hotel managers reaching millions of travelers worldwide.
           </p>

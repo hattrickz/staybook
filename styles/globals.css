@@ -75,7 +75,39 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Mobile tap targets */
+  @media (max-width: 768px) {
+
+    .btn-primary,
+    .btn-outline,
+    .btn-ghost {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+      /* prevents iOS zoom on focus */
+    }
   }
 }
