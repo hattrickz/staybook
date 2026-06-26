@@ -1,7 +1,7 @@
 export default function AdminPage() {
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-ink-secondary">Admin dashboard coming soon.</p>
     </div>
-  );
+  )
 }
