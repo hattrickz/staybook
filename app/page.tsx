@@ -26,7 +26,6 @@ const STATS = [
   { value: '2M+', label: 'Happy travelers' },
 ]
 
-// Skeleton card for loading state
 function HotelCardSkeleton() {
   return (
     <div className="card overflow-hidden animate-pulse">
@@ -36,7 +35,6 @@ function HotelCardSkeleton() {
         <div className="h-3 bg-surface-tertiary rounded w-1/2" />
         <div className="h-3 bg-surface-tertiary rounded w-1/3" />
         <div className="flex gap-2 mt-2">
-          <div className="h-5 w-12 bg-surface-tertiary rounded" />
           <div className="h-5 w-12 bg-surface-tertiary rounded" />
           <div className="h-5 w-12 bg-surface-tertiary rounded" />
         </div>
@@ -57,7 +55,6 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* Hero */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 text-center">
         <p className="text-sm font-medium text-brand uppercase tracking-widest mb-4">
           Your next getaway starts here
@@ -72,7 +69,6 @@ export default function HomePage() {
         <SearchBar variant="hero" className="max-w-4xl mx-auto" />
       </section>
 
-      {/* Stats */}
       <section className="border-y border-border bg-surface-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -86,7 +82,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Destinations */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="flex items-center justify-between mb-6">
           <h2 className="section-title">Popular destinations</h2>
@@ -99,7 +94,7 @@ export default function HomePage() {
             <Link
               key={d.name}
               href={`/hotels?location=${d.name}`}
-              className="shrink-0 w-36 h-40 rounded-2xl overflow-hidden relative group cursor-pointer"
+              className="shrink-0 w-36 h-40 rounded-2xl overflow-hidden cursor-pointer"
             >
               <div className={`w-full h-full bg-gradient-to-br ${d.color} flex flex-col items-start justify-end p-4`}>
                 <div className="text-2xl mb-1">{d.emoji}</div>
@@ -111,7 +106,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Hotels — live from GraphQL */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
         <div className="flex items-center justify-between mb-6">
           <h2 className="section-title">Featured hotels</h2>
@@ -122,7 +116,7 @@ export default function HomePage() {
 
         {error && (
           <div className="text-center py-10 text-ink-tertiary text-sm">
-            Could not load hotels. Make sure the GraphQL server is running at localhost:4000.
+            Could not load hotels. Make sure the GraphQL server is running.
           </div>
         )}
 
@@ -135,12 +129,11 @@ export default function HomePage() {
 
         {!loading && !error && hotels.length === 0 && (
           <div className="text-center py-10 text-ink-tertiary text-sm">
-            No featured hotels yet. Add some from the manager dashboard.
+            No featured hotels yet.
           </div>
         )}
       </section>
 
-      {/* CTA */}
       <section className="bg-brand mx-4 sm:mx-6 lg:mx-8 mb-14 rounded-3xl">
         <div className="max-w-3xl mx-auto px-8 py-16 text-center">
           <h2 className="text-3xl font-semibold text-white mb-4">
@@ -151,7 +144,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/auth/register?role=manager"
-            className="inline-flex items-center gap-2 bg-white text-brand font-semibold px-8 py-3.5 rounded-xl hover:bg-brand-50 transition-colors duration-150"
+            className="inline-flex items-center gap-2 bg-white text-brand font-semibold px-8 py-3.5 rounded-xl hover:bg-brand-50 transition-colors"
           >
             Get started free <ArrowRight size={16} />
           </Link>

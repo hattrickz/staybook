@@ -28,7 +28,10 @@ export const hotelResolvers = {
         hotel: async (_: any, { id }: any) => {
             return prisma.hotel.findUnique({
                 where: { id },
-                include: { rooms: true, reviews: { include: { hotel: false } } },
+                include: {
+                    rooms: true,
+                    reviews: true,
+                },
             })
         },
 

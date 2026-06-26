@@ -46,10 +46,6 @@ export const GET_HOTEL = gql`
       checkInTime
       checkOutTime
       policies
-      coordinates {
-        lat
-        lng
-      }
       rooms {
         id
         name
