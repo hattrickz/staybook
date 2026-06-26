@@ -356,7 +356,10 @@ export default function HotelDetailsPage() {
                                 </div>
                             )}
                             <Link
-                                href={selectedRoom ? `/booking/${selectedRoom.id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}` : '#rooms'}
+                                href={selectedRoom
+                                    ? `/booking/${selectedRoom.id}?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&price=${selectedRoom.price}&currency=${selectedRoom.currency}&roomName=${encodeURIComponent(selectedRoom.name)}&hotelName=${encodeURIComponent(hotel.name)}`
+                                    : '#rooms'
+                                }
                                 className={cn(
                                     'w-full block text-center font-medium py-3 rounded-xl transition-colors text-sm',
                                     selectedRoom ? 'bg-brand hover:bg-brand-600 text-white' : 'bg-surface-secondary text-ink-secondary hover:bg-surface-tertiary'
