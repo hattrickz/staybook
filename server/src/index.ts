@@ -24,15 +24,12 @@ async function main() {
 
   app.use(
     '/',
-    cors<cors.CorsRequest>({
-      origin: '*',
-      credentials: false,
-    }),
+    cors<cors.CorsRequest>({ origin: '*', credentials: false }),
     express.json(),
     expressMiddleware(server, { context: getContext }),
   )
 
-  const PORT = Number(process.env.PORT) || 4000
+  const PORT = Number(process.env.PORT) || 8080
   await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, resolve))
   console.log(`🚀 GraphQL server ready at http://localhost:${PORT}`)
 }
