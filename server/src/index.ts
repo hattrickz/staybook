@@ -1,20 +1,45 @@
 import 'dotenv/config'
 import { ApolloServer } from '@apollo/server'
-import { startStandaloneServer } from '@apollo/server/standalone'
+import { expressMiddleware } from '@apollo/server/express4'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import express from 'express'
+import http from 'http'
+import cors from 'cors'
 import { typeDefs } from './schema'
 import { resolvers } from './resolvers'
 import { getContext } from './middleware/auth'
 
 async function main() {
-    const server = new ApolloServer({ typeDefs, resolvers })
+    const app = express()
+    const httpServer = http.createServer(app)
 
-    const { url } = await startStandaloneServer(server, {
-        listen: { port: Number(process.env.PORT) || 4000 },
-        context: getContext,
+    const server = new ApolloServer({
+        typeDefs,
+        resolvers,
+        introspection: true,
+        plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     })
 
-    console.log(`🚀 GraphQL server ready at ${url}`)
-    console.log(`📊 GraphQL Playground: ${url}graphql`)
+    await server.start()
+
+    app.use(
+        '/',
+        cors<cors.CorsRequest>({
+            origin: [
+                'http://localhost:3000',
+                'https://staybook-nine.vercel.app',
+                /\.vercel\.app$/,
+                /\.railway\.app$/,
+            ],
+            credentials: true,
+        }),
+        express.json(),
+        expressMiddleware(server, { context: getContext }),
+    )
+
+    const PORT = Number(process.env.PORT) || 4000
+    await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, resolve))
+    console.log(`🚀 GraphQL server ready at http://localhost:${PORT}`)
 }
 
 main().catch(console.error)
