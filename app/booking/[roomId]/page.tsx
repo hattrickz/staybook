@@ -103,7 +103,7 @@ export default function BookingPage() {
                 status
                 room {
                   name
-                  hotel { name location }
+                 hotelId
                 }
               }
             }
@@ -162,7 +162,7 @@ export default function BookingPage() {
                         <p className="text-ink-secondary text-sm mb-6">
                             Your reservation at{' '}
                             <span className="font-medium text-ink-primary">
-                                {bookingData.room?.hotel?.name}
+                                {hotelName}
                             </span>{' '}
                             is confirmed. A confirmation email has been sent.
                         </p>
