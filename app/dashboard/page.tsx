@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useAuthStore } from '@/lib/store/auth'
@@ -9,6 +10,7 @@ import {
 import Link from 'next/link'
 import { cn, formatDate, formatPrice, BOOKING_STATUS_CONFIG } from '@/lib/utils'
 import { useEffect, useState } from 'react'
+import { gqlFetch } from '@/lib/gql'
 import { Route } from 'next'
 
 interface Booking {
@@ -21,7 +23,6 @@ interface Booking {
   totalPrice: number
   currency: string
   room: { name: string; roomType: string }
-  hotel: { name: string; location: string }
 }
 
 const NAV = [
@@ -52,29 +53,23 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!token) { setLoading(false); return }
 
-    fetch('http://localhost:4000/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        query: `query {
-          myBookings {
-            id
-            confirmationCode
-            status
-            checkIn
-            checkOut
-            nights
-            totalPrice
-            currency
-            room { name roomType }
-          }
-        }`,
-      }),
-    })
-      .then((r) => r.json())
+    gqlFetch(
+      `query {
+        myBookings {
+          id
+          confirmationCode
+          status
+          checkIn
+          checkOut
+          nights
+          totalPrice
+          currency
+          room { name roomType }
+        }
+      }`,
+      {},
+      token
+    )
       .then((d) => {
         setBookings(d.data?.myBookings ?? [])
         setLoading(false)
@@ -95,7 +90,6 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
 
-          {/* Sidebar */}
           <aside className="hidden lg:block w-56 shrink-0">
             <div className="card p-3 sticky top-24">
               <div className="px-3 py-3 mb-2 border-b border-border">
@@ -118,7 +112,6 @@ export default function DashboardPage() {
             </div>
           </aside>
 
-          {/* Main */}
           <main className="flex-1 min-w-0 space-y-6">
             <div>
               <h1 className="text-2xl font-semibold text-ink-primary">
@@ -128,7 +121,6 @@ export default function DashboardPage() {
               <p className="text-ink-secondary text-sm mt-1">Here's your travel overview</p>
             </div>
 
-            {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {stats.map((s) => (
                 <div key={s.label} className="card p-4">
@@ -143,7 +135,6 @@ export default function DashboardPage() {
               ))}
             </div>
 
-            {/* Recent bookings */}
             <div className="card">
               <div className="flex items-center justify-between p-5 border-b border-border">
                 <h2 className="font-semibold text-ink-primary">Recent bookings</h2>
@@ -201,10 +192,9 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Quick actions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link href="/hotels" className="card p-5 flex items-center gap-4 hover:shadow-elevated transition-shadow">
-                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center text-brand shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center shrink-0">
                   🔍
                 </div>
                 <div>

@@ -1,3 +1,4 @@
+
 'use client'
 
 import Link from 'next/link'
@@ -9,6 +10,8 @@ import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '@/lib/store/auth'
+import { gqlFetch } from '@/lib/gql'
+import type { Route } from 'next'
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -30,26 +33,18 @@ export default function LoginPage() {
   const onSubmit = async (values: FormValues) => {
     setLoading(true)
     try {
-      const res = await fetch('http://localhost:4000/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `
-            mutation Login($email: String!, $password: String!) {
-              login(email: $email, password: $password) {
-                token
-                user { id name email role }
-              }
-            }
-          `,
-          variables: { email: values.email, password: values.password },
-        }),
-      })
+      const { data, errors: gqlErrors } = await gqlFetch(
+        `mutation Login($email: String!, $password: String!) {
+          login(email: $email, password: $password) {
+            token
+            user { id name email role }
+          }
+        }`,
+        { email: values.email, password: values.password }
+      )
 
-      const { data, errors } = await res.json()
-
-      if (errors?.length) {
-        toast.error(errors[0].message || 'Invalid email or password')
+      if (gqlErrors?.length) {
+        toast.error(gqlErrors[0].message || 'Invalid email or password')
         return
       }
 
@@ -57,11 +52,11 @@ export default function LoginPage() {
       toast.success(`Welcome back, ${data.login.user.name.split(' ')[0]}!`)
 
       if (data.login.user.role === 'manager') {
-        router.push('/dashboard/manager')
+        router.push('/dashboard/manager' as Route)
       } else if (data.login.user.role === 'admin') {
-        router.push('/dashboard/admin')
+        router.push('/dashboard/admin' as Route)
       } else {
-        router.push('/dashboard')
+        router.push('/dashboard' as Route)
       }
     } catch (err) {
       toast.error('Could not connect to server. Is the backend running?')
@@ -72,9 +67,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-surface-secondary flex">
-      {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 bg-brand flex-col justify-between p-12">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-xl text-white">
+        <Link href={'/' as Route} className="flex items-center gap-2 font-semibold text-xl text-white">
           <span className="w-2.5 h-2.5 rounded-full bg-white inline-block" />
           StayBook
         </Link>
@@ -99,10 +93,9 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right panel */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
-          <Link href="/" className="lg:hidden flex items-center gap-2 font-semibold text-lg text-ink-primary mb-8">
+          <Link href={'/' as Route} className="lg:hidden flex items-center gap-2 font-semibold text-lg text-ink-primary mb-8">
             <span className="w-2 h-2 rounded-full bg-brand inline-block" />
             StayBook
           </Link>
@@ -110,7 +103,6 @@ export default function LoginPage() {
           <h1 className="text-2xl font-semibold text-ink-primary mb-1">Welcome back</h1>
           <p className="text-ink-secondary text-sm mb-8">Sign in to your account to continue</p>
 
-          {/* Quick test accounts */}
           <div className="bg-surface-secondary rounded-xl p-4 mb-6 space-y-2">
             <p className="text-xs font-medium text-ink-tertiary uppercase tracking-wider mb-2">
               Quick test login
@@ -147,15 +139,13 @@ export default function LoginPage() {
                 className="input"
                 autoComplete="email"
               />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="label mb-0">Password</label>
-                <Link href="#" className="text-xs text-brand hover:underline">
+                <Link href={'#' as Route} className="text-xs text-brand hover:underline">
                   Forgot password?
                 </Link>
               </div>
@@ -175,9 +165,7 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>
-              )}
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
             </div>
 
             <button
@@ -191,7 +179,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-ink-secondary mt-6">
             Don't have an account?{' '}
-            <Link href="/auth/register" className="text-brand font-medium hover:underline">
+            <Link href={'/auth/register' as Route} className="text-brand font-medium hover:underline">
               Create one
             </Link>
           </p>
