@@ -1,5 +1,5 @@
 'use client'
-
+import type { Route } from 'next'
 import { useState } from 'react'
 import Link from 'next/link'
 import {
@@ -194,10 +194,10 @@ export default function ManagerDashboardPage() {
                                 <h1 className="text-2xl font-semibold text-ink-primary">Dashboard</h1>
                                 <p className="text-sm text-ink-tertiary mt-0.5">Welcome back — here's what's happening today</p>
                             </div>
-                            <button className="btn-primary flex items-center gap-2 text-sm">
+                            <Link href={'/dashboard/manager/hotels/new' as Route} className="btn-primary flex items-center gap-2 text-sm">
                                 <Plus size={15} />
                                 New hotel
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Stats grid */}
