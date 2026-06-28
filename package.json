@@ -13,6 +13,7 @@
     "@apollo/client": "^3.11.4",
     "@hookform/resolvers": "^3.9.0",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "graphql": "^16.9.0",
