@@ -16,35 +16,36 @@ import { useAuthStore } from '@/lib/store/auth'
 import { gqlFetch } from '@/lib/gql'
 import { cn } from '@/lib/utils'
 import type { Route } from 'next'
+import { ImageUpload } from '@/components/ui/ImageUpload'
 
 const AMENITY_OPTIONS = [
-  { key: 'wifi',            label: 'Free WiFi',       icon: 'Wifi' },
-  { key: 'pool',            label: 'Swimming Pool',   icon: 'Waves' },
-  { key: 'gym',             label: 'Fitness Center',  icon: 'Dumbbell' },
-  { key: 'spa',             label: 'Spa',             icon: 'Sparkles' },
-  { key: 'restaurant',      label: 'Restaurant',      icon: 'UtensilsCrossed' },
-  { key: 'bar',             label: 'Bar & Lounge',    icon: 'Wine' },
-  { key: 'parking',         label: 'Free Parking',    icon: 'Car' },
+  { key: 'wifi', label: 'Free WiFi', icon: 'Wifi' },
+  { key: 'pool', label: 'Swimming Pool', icon: 'Waves' },
+  { key: 'gym', label: 'Fitness Center', icon: 'Dumbbell' },
+  { key: 'spa', label: 'Spa', icon: 'Sparkles' },
+  { key: 'restaurant', label: 'Restaurant', icon: 'UtensilsCrossed' },
+  { key: 'bar', label: 'Bar & Lounge', icon: 'Wine' },
+  { key: 'parking', label: 'Free Parking', icon: 'Car' },
   { key: 'airport_shuttle', label: 'Airport Shuttle', icon: 'Bus' },
-  { key: 'room_service',    label: 'Room Service',    icon: 'Bell' },
-  { key: 'breakfast',       label: 'Breakfast',       icon: 'Coffee' },
-  { key: 'pet_friendly',    label: 'Pet Friendly',    icon: 'PawPrint' },
-  { key: 'beach_access',    label: 'Beach Access',    icon: 'Umbrella' },
+  { key: 'room_service', label: 'Room Service', icon: 'Bell' },
+  { key: 'breakfast', label: 'Breakfast', icon: 'Coffee' },
+  { key: 'pet_friendly', label: 'Pet Friendly', icon: 'PawPrint' },
+  { key: 'beach_access', label: 'Beach Access', icon: 'Umbrella' },
 ]
 
 const schema = z.object({
-  name:         z.string().min(2, 'Hotel name is required'),
-  description:  z.string().min(20, 'Description must be at least 20 characters'),
-  location:     z.string().min(5, 'Full address is required'),
-  city:         z.string().min(2, 'City is required'),
-  country:      z.string().min(2, 'Country is required'),
-  priceFrom:    z.number().min(1, 'Starting price is required'),
-  currency:     z.string().min(1, 'Currency is required'),
-  checkInTime:  z.string().min(1, 'Check-in time is required'),
+  name: z.string().min(2, 'Hotel name is required'),
+  description: z.string().min(20, 'Description must be at least 20 characters'),
+  location: z.string().min(5, 'Full address is required'),
+  city: z.string().min(2, 'City is required'),
+  country: z.string().min(2, 'Country is required'),
+  priceFrom: z.number().min(1, 'Starting price is required'),
+  currency: z.string().min(1, 'Currency is required'),
+  checkInTime: z.string().min(1, 'Check-in time is required'),
   checkOutTime: z.string().min(1, 'Check-out time is required'),
-  amenities:    z.array(z.string()).min(1, 'Select at least one amenity'),
-  policies:     z.array(z.string()),
-  images:       z.array(z.string()),
+  amenities: z.array(z.string()).min(1, 'Select at least one amenity'),
+  policies: z.array(z.string()),
+  images: z.array(z.string()),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -56,24 +57,25 @@ const STEPS = ['Basic info', 'Location', 'Amenities', 'Policies', 'Review']
 export default function NewHotelPage() {
   const router = useRouter()
   const { token, isAuthenticated } = useAuthStore()
-  const [step,        setStep]        = useState(0)
+  const [step, setStep] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
-  const [policies,    setPolicies]    = useState<string[]>([
+  const [images, setImages] = useState<string[]>([])
+  const [policies, setPolicies] = useState<string[]>([
     'No smoking inside rooms',
     'Valid ID required at check-in',
   ])
-  const [newPolicy,   setNewPolicy]   = useState('')
+  const [newPolicy, setNewPolicy] = useState('')
 
   const { register, handleSubmit, trigger, formState: { errors }, setValue, watch } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      currency:     'NGN',
-      checkInTime:  '2:00 PM',
+      currency: 'NGN',
+      checkInTime: '2:00 PM',
       checkOutTime: '12:00 PM',
-      amenities:    [],
-      policies:     [],
-      images:       [],
+      amenities: [],
+      policies: [],
+      images: [],
     },
   })
 
@@ -86,7 +88,7 @@ export default function NewHotelPage() {
 
   const handleNext = async () => {
     const fields = stepFields[step]
-    const valid  = await trigger(fields)
+    const valid = await trigger(fields)
     if (valid) setStep((s) => s + 1)
   }
 
@@ -134,18 +136,18 @@ export default function NewHotelPage() {
         }`,
         {
           input: {
-            name:         values.name,
-            description:  values.description,
-            location:     values.location,
-            city:         values.city,
-            country:      values.country,
-            priceFrom:    values.priceFrom,
-            currency:     values.currency,
-            checkInTime:  values.checkInTime,
+            name: values.name,
+            description: values.description,
+            location: values.location,
+            city: values.city,
+            country: values.country,
+            priceFrom: values.priceFrom,
+            currency: values.currency,
+            checkInTime: values.checkInTime,
             checkOutTime: values.checkOutTime,
-            amenities:    amenitiesInput,
-            policies:     policies,
-            images:       [],
+            amenities: amenitiesInput,
+            policies: policies,
+            images: [],
           },
         },
         token || ''
@@ -166,10 +168,10 @@ export default function NewHotelPage() {
   }
 
   const priceFrom = watch('priceFrom')
-  const currency  = watch('currency')
-  const name      = watch('name')
-  const city      = watch('city')
-  const country   = watch('country')
+  const currency = watch('currency')
+  const name = watch('name')
+  const city = watch('city')
+  const country = watch('country')
 
   return (
     <div className="min-h-screen bg-surface-tertiary">
@@ -197,9 +199,9 @@ export default function NewHotelPage() {
             <div key={label} className="flex items-center gap-2 shrink-0">
               <div className={cn(
                 'flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full',
-                i < step  ? 'bg-brand text-white' :
-                i === step ? 'bg-ink-primary text-white' :
-                'bg-surface-secondary text-ink-tertiary'
+                i < step ? 'bg-brand text-white' :
+                  i === step ? 'bg-ink-primary text-white' :
+                    'bg-surface-secondary text-ink-tertiary'
               )}>
                 <span>{i + 1}</span>
                 <span className="hidden sm:inline">{label}</span>
@@ -268,6 +270,17 @@ export default function NewHotelPage() {
                   <label className="label">Check-out time</label>
                   <input {...register('checkOutTime')} className="input" placeholder="12:00 PM" />
                 </div>
+              </div>
+              <div>
+                <label className="label">Hotel photos</label>
+                <ImageUpload
+                  value={images}
+                  onChange={(urls) => { setImages(urls); setValue('images', urls) }}
+                  maxImages={6}
+                />
+                <p className="text-xs text-ink-tertiary mt-1">
+                  Upload up to 6 photos. First photo will be the cover image.
+                </p>
               </div>
             </div>
           )}
@@ -397,12 +410,12 @@ export default function NewHotelPage() {
 
               <div className="bg-surface-secondary rounded-xl p-5 space-y-3">
                 {[
-                  { label: 'Hotel name',   value: name },
-                  { label: 'City',         value: city },
-                  { label: 'Country',      value: country },
-                  { label: 'Price from',   value: `${currency} ${priceFrom?.toLocaleString()}/night` },
-                  { label: 'Amenities',    value: `${selectedAmenities.length} selected` },
-                  { label: 'Policies',     value: `${policies.length} policies` },
+                  { label: 'Hotel name', value: name },
+                  { label: 'City', value: city },
+                  { label: 'Country', value: country },
+                  { label: 'Price from', value: `${currency} ${priceFrom?.toLocaleString()}/night` },
+                  { label: 'Amenities', value: `${selectedAmenities.length} selected` },
+                  { label: 'Policies', value: `${policies.length} policies` },
                 ].map((row) => (
                   <div key={row.label} className="flex justify-between text-sm">
                     <span className="text-ink-tertiary">{row.label}</span>
