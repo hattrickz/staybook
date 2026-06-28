@@ -13,9 +13,10 @@ import { useAuthStore } from '@/lib/store/auth'
 import { gqlFetch } from '@/lib/gql'
 import { cn, formatPrice } from '@/lib/utils'
 import type { Route } from 'next'
+import { ImageUpload } from '@/components/ui/ImageUpload'
 
 const ROOM_TYPES = ['standard', 'deluxe', 'suite', 'presidential', 'family']
-const BED_TYPES  = ['single', 'double', 'queen', 'king', 'twin']
+const BED_TYPES = ['single', 'double', 'queen', 'king', 'twin']
 const CURRENCIES = ['NGN', 'USD', 'GBP', 'EUR', 'AED', 'GHS', 'KES', 'ZAR']
 
 const ROOM_AMENITIES = [
@@ -25,16 +26,16 @@ const ROOM_AMENITIES = [
 ]
 
 const schema = z.object({
-  name:             z.string().min(2, 'Room name is required'),
-  roomType:         z.string().min(1, 'Room type is required'),
-  bedType:          z.string().min(1, 'Bed type is required'),
-  price:            z.number().min(1, 'Price is required'),
-  currency:         z.string().min(1, 'Currency is required'),
-  capacity:         z.number().min(1).max(10),
-  size:             z.number().min(1, 'Room size is required'),
-  description:      z.string().min(10, 'Description is required'),
-  refundable:       z.boolean(),
-  breakfastIncluded:z.boolean(),
+  name: z.string().min(2, 'Room name is required'),
+  roomType: z.string().min(1, 'Room type is required'),
+  bedType: z.string().min(1, 'Bed type is required'),
+  price: z.number().min(1, 'Price is required'),
+  currency: z.string().min(1, 'Currency is required'),
+  capacity: z.number().min(1).max(10),
+  size: z.number().min(1, 'Room size is required'),
+  description: z.string().min(10, 'Description is required'),
+  refundable: z.boolean(),
+  breakfastIncluded: z.boolean(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -54,25 +55,26 @@ export default function AddRoomsPage() {
   const { token } = useAuthStore()
   const hotelId = params.hotelId as string
 
-  const [addedRooms,      setAddedRooms]      = useState<AddedRoom[]>([])
+  const [addedRooms, setAddedRooms] = useState<AddedRoom[]>([])
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
-  const [isSubmitting,    setIsSubmitting]     = useState(false)
-  const [showForm,        setShowForm]         = useState(true)
+  const [roomImages, setRoomImages] = useState<string[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showForm, setShowForm] = useState(true)
 
   const { register, handleSubmit, reset, formState: { errors }, watch } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      currency:          'NGN',
-      capacity:          2,
-      size:              30,
-      refundable:        true,
+      currency: 'NGN',
+      capacity: 2,
+      size: 30,
+      refundable: true,
       breakfastIncluded: false,
-      roomType:          'standard',
-      bedType:           'queen',
+      roomType: 'standard',
+      bedType: 'queen',
     },
   })
 
-  const price    = watch('price')
+  const price = watch('price')
   const currency = watch('currency')
 
   const toggleAmenity = (a: string) =>
@@ -97,18 +99,18 @@ export default function AddRoomsPage() {
         {
           input: {
             hotelId,
-            name:              values.name,
-            roomType:          values.roomType,
-            bedType:           values.bedType,
-            price:             values.price,
-            currency:          values.currency,
-            capacity:          values.capacity,
-            size:              values.size,
-            description:       values.description,
-            refundable:        values.refundable,
+            name: values.name,
+            roomType: values.roomType,
+            bedType: values.bedType,
+            price: values.price,
+            currency: values.currency,
+            capacity: values.capacity,
+            size: values.size,
+            description: values.description,
+            refundable: values.refundable,
             breakfastIncluded: values.breakfastIncluded,
-            amenities:         selectedAmenities,
-            images:            [],
+            amenities: selectedAmenities,
+            images: roomImages,
           },
         },
         token || ''
@@ -122,6 +124,7 @@ export default function AddRoomsPage() {
       setAddedRooms((prev) => [...prev, data.createRoom])
       toast.success(`${data.createRoom.name} added!`)
       reset()
+      setRoomImages([])
       setSelectedAmenities([])
       setShowForm(false)
     } catch (err) {
@@ -257,6 +260,15 @@ export default function AddRoomsPage() {
                 placeholder="Describe this room…"
               />
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description.message}</p>}
+            </div>
+
+            <div>
+              <label className="label">Room photos</label>
+              <ImageUpload
+                value={roomImages}
+                onChange={setRoomImages}
+                maxImages={4}
+              />
             </div>
 
             {/* Amenities */}

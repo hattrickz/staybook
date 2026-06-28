@@ -75,7 +75,7 @@ export default function NewHotelPage() {
       checkOutTime: '12:00 PM',
       amenities: [],
       policies: [],
-      images: [],
+      images: images,
     },
   })
 
